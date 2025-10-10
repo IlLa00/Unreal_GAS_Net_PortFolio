@@ -1,0 +1,29 @@
+﻿#pragma once
+
+#include "CoreMinimal.h"
+#include "Character/MyCharacterBase.h"
+#include "MyPlayer.generated.h"
+
+UCLASS()
+class UE_GAS_NET_PORTFOLIO_API AMyPlayer : public AMyCharacterBase
+{
+	GENERATED_BODY()
+
+public:
+	AMyPlayer();
+
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class UCameraComponent* CamComp;
+};
