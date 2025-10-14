@@ -1,12 +1,18 @@
 ﻿#include "MyPlayerState.h"
 #include "Net/UnrealNetwork.h"
 #include "AbilitySystemComponent.h"
+#include "AttributeSet/MyAttributeSet.h"
 
 AMyPlayerState::AMyPlayerState()
 {
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	ASC->SetIsReplicated(true);
+	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed); 
 
-	NetUpdateFrequency = 100.0f; // PlayerState 기본값이 낮아서 GAS에 부족할 수 있음.
+	AttributeSet = CreateDefaultSubobject<UMyAttributeSet>(TEXT("AttributeSet"));
+
+	// PlayerState 기본값이 낮아서 GAS에 부족할 수 있음.
+	NetUpdateFrequency = 100.0f;
 }
 
 UAbilitySystemComponent* AMyPlayerState::GetAbilitySystemComponent() const
