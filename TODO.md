@@ -193,5 +193,80 @@ _이슈 없음_
 
 ---
 
-**최종 업데이트**: 2025-10-10
-**다음 목표**: Phase 2 - AttributeSet 구현
+**최종 업데이트**: 2025-10-21
+**다음 목표**: 추가 스킬 구현 (5개) 및 테스트
+
+---
+
+## 🎯 MMORPG 포트폴리오 로드맵
+
+### ✅ 완료된 기능
+
+#### 1. PlayerController 타겟팅 시스템 ✅
+- ✅ CurrentTarget 변수 및 네트워크 복제
+- ✅ FindNearestEnemy() - 30m 반경, 180도 시야각
+- ✅ Tab 키 타겟팅
+- ✅ Server RPC를 통한 타겟 동기화
+- ✅ Enemy 태그 기반 타겟 필터링
+
+#### 2. Enhanced Input 시스템 통합 ✅
+- ✅ PlayerController로 모든 입력 통합
+- ✅ Mapping Context 관리
+- ✅ 이동/시점/점프/달리기 입력 처리
+- ✅ Ability 1~6 입력 바인딩
+
+#### 3. GAS 스킬 시스템 기본 구조 ✅
+- ✅ MyGameplayAbility 베이스 클래스
+  - 코스트 체크 (마나/스태미나)
+  - 타겟 획득 및 거리 체크
+  - Helper 함수 (GetASC, GetAttributeSet 등)
+- ✅ GA_MeleeAttack (첫 번째 스킬)
+  - 근접 공격 (2m 사거리)
+  - 스태미나 10 소모
+  - 데미지 계산 (AttackPower + BaseDamage - Defense)
+- ✅ PlayerState Ability 부여 시스템
+  - DefaultAbilities 배열
+  - GrantAbilities() / RemoveAbilities()
+- ✅ PlayerController Ability 활성화
+  - ActivateAbilityBySlot(1~6)
+  - 슬롯 번호로 Ability 찾아서 실행
+
+### 🔄 진행 중
+
+#### 4. 추가 스킬 구현 (5개)
+- ⏳ GA_HeavyStrike - 강공격 (2번 키)
+- ⏳ GA_HealingWave - 힐 스킬 (3번 키)
+- ⏳ GA_AoEBlast - 범위 공격 (4번 키)
+- ⏳ GA_Haste - 이동속도 버프 (5번 키)
+- ⏳ GA_Ultimate - 궁극기 (6번 키)
+
+### ⏳ 예정된 작업
+
+#### 5. GameplayEffect 시스템
+- ⏳ GE_Cooldown - 쿨다운 Effect
+- ⏳ GE_Cost - 코스트 Effect
+- ⏳ GE_Damage - 데미지 Effect
+
+#### 6. 파티 시스템
+- ⏳ PartyManager (GameState)
+- ⏳ 파티 초대/수락/거절
+- ⏳ 파티원 UI (체력/마나바)
+- ⏳ 파티 버프 공유
+
+#### 7. AI Boss
+- ⏳ MyAIController 구현
+- ⏳ Behavior Tree
+- ⏳ 페이즈 전환 (50% HP)
+- ⏳ 패턴 공격
+
+#### 8. 전투 UI
+- ⏳ HUD (체력/마나/스태미나바)
+- ⏳ 스킬바 (쿨다운 표시)
+- ⏳ 타겟 프레임
+- ⏳ 파티 프레임
+- ⏳ Floating Combat Text
+
+#### 9. 네트워크 테스트
+- ⏳ 4인 파티 테스트
+- ⏳ Dedicated Server
+- ⏳ 최적화

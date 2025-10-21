@@ -62,7 +62,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes|Combat", ReplicatedUsing = OnRep_MagicResistance)
 	FGameplayAttributeData MagicResistance;
 	ATTRIBUTE_ACCESSORS(UMyAttributeSet, MagicResistance)
-
+		
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes|Movement", ReplicatedUsing = OnRep_MovementSpeed)
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ACCESSORS(UMyAttributeSet, MovementSpeed)
