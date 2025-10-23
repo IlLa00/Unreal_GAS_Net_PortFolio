@@ -57,7 +57,6 @@ void AMyPlayerController::SetupInputComponent()
 		if (TargetToggleAction)
 			EnhancedInputComponent->BindAction(TargetToggleAction, ETriggerEvent::Triggered, this, &AMyPlayerController::OnTargetToggle);
 
-		// Ability 1~6
 		if (Ability1Action)
 			EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Triggered, this, &AMyPlayerController::OnAbility1);
 		if (Ability2Action)
@@ -82,12 +81,19 @@ void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void AMyPlayerController::ToggleTargetSelection()
 {
-	AMyEnemy* NewTarget = FindNearestEnemy();
-
-	if (NewTarget && NewTarget != CurrentTarget)
-		Server_SetTarget(NewTarget);
-	else if (!NewTarget && CurrentTarget)
+	// 타겟이 이미 있으면 해제 (토글)
+	if (CurrentTarget)
+	{
 		ClearTarget();
+		return;
+	}
+
+	// 타겟이 없으면 가장 가까운 적을 찾아서 설정
+	AMyEnemy* NewTarget = FindNearestEnemy();
+	if (NewTarget)
+	{
+		Server_SetTarget(NewTarget);
+	}
 }
 
 void AMyPlayerController::ClearTarget()
@@ -97,12 +103,10 @@ void AMyPlayerController::ClearTarget()
 
 void AMyPlayerController::Server_SetTarget_Implementation(AMyEnemy* NewTarget)
 {
-	if (!NewTarget)
-		return;
-
 	CurrentTarget = NewTarget;
 
-	// 클라이언트도 OnRep_CurrentTarget 호출을 위해 복제됨
+	// 서버에서도 회전 모드 변경 (OnRep은 클라이언트에서만 호출됨)
+	OnRep_CurrentTarget();
 }
 
 AMyEnemy* AMyPlayerController::FindNearestEnemy()
@@ -137,7 +141,7 @@ AMyEnemy* AMyPlayerController::FindNearestEnemy()
 	for (AActor* Actor : FoundActors)
 	{
 		AMyEnemy* Enemy = Cast<AMyEnemy>(Actor);
-		if (!Enemy) return nullptr;
+		if (!Enemy) continue;
 
 		FVector ToTarget = Enemy->GetActorLocation() - MyLocation;
 		float Distance = ToTarget.Size();
@@ -166,6 +170,25 @@ void AMyPlayerController::OnRep_CurrentTarget()
 	// 타겟이 변경되면 UI 업데이트
 	// TODO: UI 위젯에 이벤트 전달
 
+	// 캐릭터 회전 모드 변경
+	if (ACharacter* character = Cast<ACharacter>(GetPawn()))
+	{
+		if (UCharacterMovementComponent* MovementComp = character->GetCharacterMovement())
+		{
+			if (CurrentTarget)
+			{
+				// 타겟이 있으면 이동 방향으로 회전하지 않음 (카메라 방향 유지)
+				MovementComp->bOrientRotationToMovement = false;
+				MovementComp->bUseControllerDesiredRotation = false;
+			}
+			else
+			{
+				// 타겟이 없으면 이동 방향으로 회전
+				MovementComp->bOrientRotationToMovement = true;
+				MovementComp->bUseControllerDesiredRotation = false;
+			}
+		}
+	}
 }
 
 void AMyPlayerController::OnTargetToggle()

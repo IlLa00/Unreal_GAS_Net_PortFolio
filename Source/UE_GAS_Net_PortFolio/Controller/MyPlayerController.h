@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "AbilitySystemInterface.h"
 #include "MyPlayerController.generated.h"
 
 class UInputAction;

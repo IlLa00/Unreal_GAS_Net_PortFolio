@@ -1,4 +1,4 @@
-﻿#include "MyAttributeSet.h"
+#include "MyAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"

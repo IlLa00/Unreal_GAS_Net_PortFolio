@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayAbilitySpec.h"
 #include "MyPlayerState.generated.h"
 
 class UMyAttributeSet;
@@ -22,21 +24,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GAS")
 	UMyAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
-	// ================================================================
-	// Ability Management
-	// ================================================================
-
-	/** 시작 시 부여할 Ability 리스트 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TArray<TSubclassOf<UMyGameplayAbility>> DefaultAbilities;
 
-	/** Ability 부여 */
 	void GrantAbilities();
-
-	/** Ability 제거 */
 	void RemoveAbilities();
 
-	/** 부여된 Ability Handle 저장 */
 	UPROPERTY()
 	TArray<FGameplayAbilitySpecHandle> GrantedAbilityHandles;
 

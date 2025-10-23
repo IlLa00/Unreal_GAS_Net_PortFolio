@@ -1,9 +1,12 @@
-﻿#include "Character/MyPlayer.h"
+#include "Character/MyPlayer.h"
 #include "PlayerState/MyPlayerState.h"
+#include "Controller/MyPlayerController.h"
+#include "Character/MyEnemy.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AMyPlayer::AMyPlayer()
 {
@@ -71,6 +74,46 @@ void AMyPlayer::BeginPlay()
 void AMyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 타겟 락온 카메라 회전
+	AMyPlayerController* PC = Cast<AMyPlayerController>(GetController());
+	if (PC && PC->CurrentTarget)
+	{
+		// 타겟이 유효한지 체크 (죽었거나 너무 멀면 타겟 해제)
+		if (!IsValid(PC->CurrentTarget) || PC->CurrentTarget->IsPendingKillPending())
+		{
+			PC->ClearTarget();
+			return;
+		}
+
+		// 타겟과의 거리 체크
+		float Distance = FVector::Dist(GetActorLocation(), PC->CurrentTarget->GetActorLocation());
+		if (Distance > 5000.0f) // 50m 이상 떨어지면 타겟 해제
+		{
+			PC->ClearTarget();
+			return;
+		}
+
+		// 타겟 방향 계산
+		FVector TargetLocation = PC->CurrentTarget->GetActorLocation();
+		FVector MyLocation = GetActorLocation();
+		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(MyLocation, TargetLocation);
+
+		// 컨트롤러 회전을 타겟 방향으로 부드럽게 보간
+		FRotator CurrentRotation = GetControlRotation();
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, LookAtRotation, DeltaTime, 10.0f);
+
+		// Pitch만 제한 (너무 위아래로 보지 않도록)
+		NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch, -45.0f, 45.0f);
+
+		PC->SetControlRotation(NewRotation);
+
+		// 캐릭터도 타겟 방향으로 부드럽게 회전 (Yaw만)
+		FRotator CharacterRotation = GetActorRotation();
+		FRotator TargetCharacterRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+		FRotator NewCharacterRotation = FMath::RInterpTo(CharacterRotation, TargetCharacterRotation, DeltaTime, 8.0f);
+		SetActorRotation(NewCharacterRotation);
+	}
 }
 
 void AMyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

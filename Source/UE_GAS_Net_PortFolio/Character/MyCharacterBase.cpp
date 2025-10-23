@@ -1,4 +1,4 @@
-﻿#include "MyCharacterBase.h"
+#include "MyCharacterBase.h"
 
 AMyCharacterBase::AMyCharacterBase()
 {

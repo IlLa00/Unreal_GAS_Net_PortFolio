@@ -1,4 +1,4 @@
-﻿#include "GameMode/MyGameModeBase.h"
+#include "GameMode/MyGameModeBase.h"
 #include "PlayerState/MyPlayerState.h"
 #include "Controller/MyPlayerController.h"
 #include "Character/MyPlayer.h"

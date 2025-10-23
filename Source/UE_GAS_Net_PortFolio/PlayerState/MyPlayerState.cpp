@@ -28,23 +28,16 @@ void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AMyPlayerState, ASC);
 }
 
-// ================================================================
-// Ability Management
-// ================================================================
-
 void AMyPlayerState::GrantAbilities()
 {
 	if (!ASC)
 		return;
 
-	// 서버에서만 Ability 부여
 	if (GetLocalRole() != ROLE_Authority)
 		return;
 
-	// 기존 Ability 제거
 	RemoveAbilities();
 
-	// Default Abilities 부여
 	for (TSubclassOf<UMyGameplayAbility> AbilityClass : DefaultAbilities)
 	{
 		if (!AbilityClass)
@@ -66,11 +59,8 @@ void AMyPlayerState::RemoveAbilities()
 	if (GetLocalRole() != ROLE_Authority)
 		return;
 
-	// 부여된 Ability 제거
 	for (FGameplayAbilitySpecHandle Handle : GrantedAbilityHandles)
-	{
 		ASC->ClearAbility(Handle);
-	}
 
 	GrantedAbilityHandles.Empty();
 }

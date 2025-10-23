@@ -193,8 +193,8 @@ _이슈 없음_
 
 ---
 
-**최종 업데이트**: 2025-10-21
-**다음 목표**: 추가 스킬 구현 (5개) 및 테스트
+**최종 업데이트**: 2025-10-22
+**다음 목표**: UI 시스템 구축 (체력바, 스킬 아이콘, 쿨다운 표시)
 
 ---
 
@@ -202,12 +202,38 @@ _이슈 없음_
 
 ### ✅ 완료된 기능
 
+#### 0. 프로젝트 빌드 수정 및 최적화 ✅ (2025-10-22)
+- ✅ BOM (Byte Order Mark) 제거 - 모든 소스 파일 (.h, .cpp)
+- ✅ Build.cs 파일 정리
+  - 중복 모듈 제거 (GameplayTasks, Niagara, GameplayAbilities, GameplayTags)
+  - Public/Private 모듈 분류 최적화
+- ✅ GameplayAbilities 헤더 파일 추가
+  - MyPlayerState.h: GameplayAbilitySpec.h
+  - MyAttributeSet.h: GameplayEffectExtension.h
+  - MyGameplayAbility.h: GameplayTagContainer.h
+  - MyPlayerController.h: AbilitySystemInterface.h
+  - MyCharacterBase.h: AbilitySystemInterface.h
+- ✅ MyEnemy AbilitySystemComponent 구현
+  - IAbilitySystemInterface 상속
+  - ASC 및 AttributeSet 추가
+  - 네트워크 복제 설정 (Minimal 모드)
+
 #### 1. PlayerController 타겟팅 시스템 ✅
 - ✅ CurrentTarget 변수 및 네트워크 복제
 - ✅ FindNearestEnemy() - 30m 반경, 180도 시야각
 - ✅ Tab 키 타겟팅
 - ✅ Server RPC를 통한 타겟 동기화
 - ✅ Enemy 태그 기반 타겟 필터링
+- ✅ **타겟 락온 카메라 시스템** (2025-10-22)
+  - 카메라가 타겟을 자동으로 추적
+  - 캐릭터 몸체도 타겟 방향으로 회전
+  - 부드러운 보간 (Camera: 10.0, Character: 8.0)
+  - Pitch 각도 제한 (-45° ~ 45°)
+  - 자동 타겟 해제 (거리 50m 이상, 타겟 사망)
+- ✅ **타겟 토글 기능 개선** (2025-10-22)
+  - Tab 키로 락온/해제 토글
+  - 락온 해제 시 캐릭터 회전 모드 복구
+  - bOrientRotationToMovement 자동 전환
 
 #### 2. Enhanced Input 시스템 통합 ✅
 - ✅ PlayerController로 모든 입력 통합
