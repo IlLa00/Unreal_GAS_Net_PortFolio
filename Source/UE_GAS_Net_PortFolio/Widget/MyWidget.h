@@ -9,4 +9,5 @@ class UE_GAS_NET_PORTFOLIO_API UMyWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+
 };
