@@ -202,7 +202,36 @@ _이슈 없음_
 
 ### ✅ 완료된 기능
 
-#### 0. 프로젝트 빌드 수정 및 최적화 ✅ (2025-10-22)
+#### 0. 콤보 공격 시스템 구현 ✅ (2025-01-24)
+- ✅ **GA_MeleeAttack 콤보 시스템 추가**
+  - 최대 3단 콤보 지원 (MaxComboCount = 3)
+  - 콤보 리셋 타이머 (1.5초)
+  - ComboMontages 배열로 각 콤보 단계별 애니메이션 관리
+  - CurrentComboCount 자동 추적 및 리셋 로직
+  - PlayComboMontage() / ResetCombo() 함수 구현
+- ✅ **MeleeWeaponComponent 충돌체 제어 시스템**
+  - EnableCollision() / DisableCollision() 함수 추가
+  - HitActors 배열로 중복 피격 방지
+  - 캡슐 컴포넌트(HitCapsule) 기반 충돌 감지
+  - 충돌체 활성화 상태 관리 (bIsAttacking)
+- ✅ **AnimNotify_WeaponCollision 클래스 생성**
+  - 애니메이션 노티파이로 무기 충돌체 ON/OFF 제어
+  - bEnableCollision 플래그로 타이밍 정밀 제어
+  - 애니메이션 프레임에서 공격 판정 시작/종료 관리
+  - 파일 위치: `Source/UE_GAS_Net_PortFolio/AnimNotify/`
+- ✅ **캐릭터 구조 리팩토링**
+  - MyCharacterBase: 무기 컴포넌트 제거 (공통 기능만 유지)
+  - MyPlayer: 카메라, 컨트롤러 등 플레이어 공통 기능
+  - **AuroraPlayer 클래스 추가**: 근접 무기(칼) 전용 캐릭터
+    - MeleeWeaponComponent 추가
+    - "weapon" 소켓에 무기 부착
+    - 파일: `Source/UE_GAS_Net_PortFolio/Character/AuroraPlayer.h/cpp`
+- ✅ **입력 시스템 - 마우스 왼쪽 클릭**
+  - MyPlayerController에 MainAction 추가
+  - OnMainAction() 콜백으로 슬롯 1번 Ability 실행
+  - Enhanced Input System 사용
+
+#### 1. 프로젝트 빌드 수정 및 최적화 ✅ (2025-10-22)
 - ✅ BOM (Byte Order Mark) 제거 - 모든 소스 파일 (.h, .cpp)
 - ✅ Build.cs 파일 정리
   - 중복 모듈 제거 (GameplayTasks, Niagara, GameplayAbilities, GameplayTags)
@@ -268,6 +297,29 @@ _이슈 없음_
 
 ### ⏳ 예정된 작업
 
+#### 4.1 콤보 공격 시스템 - 언리얼 에디터 설정 ⏳
+- ⏳ **Input Action 설정**
+  - IA_MainAction Input Action 생성
+  - Input Mapping Context에 왼쪽 마우스 버튼 매핑
+  - BP_MyPlayerController에서 MainAction 할당
+- ⏳ **애니메이션 몽타주 설정**
+  - Primary_Attack_A_Montage (1타) 생성
+  - Primary_Attack_B_Montage (2타) 생성
+  - Primary_Attack_C_Montage (3타) 생성
+  - BP_GA_MeleeAttack에서 ComboMontages 배열에 할당
+- ⏳ **애니메이션 노티파이 배치**
+  - 각 콤보 몽타주에 AnimNotify_WeaponCollision 추가
+  - 공격 시작 프레임: bEnableCollision = true
+  - 공격 종료 프레임: bEnableCollision = false
+- ⏳ **스켈레탈 메시 소켓 설정**
+  - Aurora 스켈레탈 메시에 "weapon" 소켓 생성
+  - 손 본에 소켓 부착
+  - 소켓 위치/회전 조정
+- ⏳ **MeleeWeaponComponent 설정**
+  - BP_Aurora에서 MeleeWeapon 컴포넌트 확인
+  - HitCapsule 크기 조정 (CapsuleRadius, CapsuleHalfHeight)
+  - 디버그용 충돌체 시각화 활성화
+
 #### 5. GameplayEffect 시스템
 - ⏳ GE_Cooldown - 쿨다운 Effect
 - ⏳ GE_Cost - 코스트 Effect
@@ -296,3 +348,108 @@ _이슈 없음_
 - ⏳ 4인 파티 테스트
 - ⏳ Dedicated Server
 - ⏳ 최적화
+
+---
+
+## 📂 주요 파일 구조
+
+```
+Source/UE_GAS_Net_PortFolio/
+├── Ability/
+│   ├── GA_MeleeAttack.h/cpp       # 콤보 공격 Ability (3단 콤보)
+│   └── MyGameplayAbility.h/cpp    # Ability 베이스 클래스
+├── AnimNotify/
+│   └── AnimNotify_WeaponCollision.h/cpp  # 무기 충돌 노티파이
+├── Character/
+│   ├── MyCharacterBase.h/cpp      # 공통 캐릭터 기능
+│   ├── MyPlayer.h/cpp             # 공통 플레이어 기능
+│   ├── AuroraPlayer.h/cpp         # 근접 무기 캐릭터 ⚔️
+│   ├── MyEnemy.h/cpp              # 적 캐릭터
+│   └── MyBoss.h/cpp               # 보스 캐릭터
+├── Controller/
+│   ├── MyPlayerController.h/cpp   # 입력 처리 (MainAction, 타겟팅)
+│   └── MyAIController.h/cpp       # AI 컨트롤러
+├── PlayerState/
+│   └── MyPlayerState.h/cpp        # ASC 및 AttributeSet 관리
+├── AttributeSet/
+│   └── MyAttributeSet.h/cpp       # 속성 관리 (HP, MP, Stamina 등)
+└── Weapon/
+    ├── WeaponComponent.h/cpp      # 무기 베이스 클래스
+    └── MeleeWeaponComponent.h/cpp # 근접 무기 컴포넌트
+```
+
+---
+
+## 💡 콤보 공격 시스템 작동 방식
+
+### 1. 콤보 입력 흐름
+```
+왼쪽 마우스 클릭
+  ↓
+OnMainAction() (MyPlayerController)
+  ↓
+ActivateAbilityBySlot(1)
+  ↓
+GA_MeleeAttack::ActivateAbility()
+  ↓
+CurrentComboCount++ (1→2→3→1...)
+  ↓
+PlayComboMontage()
+  ↓
+ComboMontages[CurrentComboCount-1] 재생
+```
+
+### 2. 콤보 타이밍 관리
+- 1.5초 안에 다음 클릭 → 콤보 이어짐
+- 1.5초 경과 → ResetCombo() 호출 (CurrentComboCount = 0)
+- FTimerHandle로 타이머 관리
+
+### 3. 무기 충돌 작동 방식
+```
+애니메이션 재생
+  ↓
+AnimNotify_WeaponCollision (bEnableCollision = true)
+  ↓
+MeleeWeapon->EnableCollision()
+  ↓
+HitCapsule 충돌 활성화
+  ↓
+OnHitCapsuleBeginOverlap() - 충돌 감지
+  ↓
+HitActors 배열 체크 (중복 피격 방지)
+  ↓
+데미지 적용
+  ↓
+AnimNotify_WeaponCollision (bEnableCollision = false)
+  ↓
+DisableCollision()
+```
+
+---
+
+## 🐛 알려진 이슈
+_현재 이슈 없음_
+
+---
+
+## 📝 참고 사항
+
+### 콤보 시스템
+- ComboMontages 배열은 블루프린트에서 설정 필요
+- 애니메이션 몽타주에 노티파이 배치 필수
+- 콤보 리셋 시간은 ComboResetTime 변수로 조정 가능
+
+### 무기 충돌 시스템
+- HitCapsule 크기는 무기에 맞게 조정 필요
+- weapon 소켓 위치가 정확해야 충돌 판정이 정상 작동
+- bIsAttacking 플래그로 충돌 활성화 상태 관리
+
+### 캐릭터 확장
+- 총 쏘는 캐릭터는 MyPlayer 상속 + RangedWeaponComponent 추가
+- 각 캐릭터 타입별로 고유한 무기 컴포넌트 사용
+
+---
+
+**최종 업데이트**: 2025-01-24
+**최신 커밋**: 9b17e27 - "feat: Implement combo attack system with animation notify"
+**다음 목표**: 언리얼 에디터에서 콤보 애니메이션 몽타주 설정 및 노티파이 배치
