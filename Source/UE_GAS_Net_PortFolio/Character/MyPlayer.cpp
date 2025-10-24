@@ -1,4 +1,4 @@
-#include "Character/MyPlayer.h"
+﻿#include "Character/MyPlayer.h"
 #include "PlayerState/MyPlayerState.h"
 #include "Controller/MyPlayerController.h"
 #include "Character/MyEnemy.h"
@@ -13,7 +13,7 @@ AMyPlayer::AMyPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
-	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->SetupAttachment(GetMesh());
 	SpringArmComp->SocketOffset = FVector(0, 70, 90);
 	SpringArmComp->TargetArmLength = 300;
 	SpringArmComp->bUsePawnControlRotation = true;

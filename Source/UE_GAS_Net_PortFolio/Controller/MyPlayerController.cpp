@@ -57,6 +57,10 @@ void AMyPlayerController::SetupInputComponent()
 		if (TargetToggleAction)
 			EnhancedInputComponent->BindAction(TargetToggleAction, ETriggerEvent::Triggered, this, &AMyPlayerController::OnTargetToggle);
 
+		// 기본 공격 (왼쪽 마우스 클릭)
+		if (MainAction)
+			EnhancedInputComponent->BindAction(MainAction, ETriggerEvent::Triggered, this, &AMyPlayerController::OnMainAction);
+
 		if (Ability1Action)
 			EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Triggered, this, &AMyPlayerController::OnAbility1);
 		if (Ability2Action)
@@ -194,6 +198,12 @@ void AMyPlayerController::OnRep_CurrentTarget()
 void AMyPlayerController::OnTargetToggle()
 {
 	ToggleTargetSelection();
+}
+
+void AMyPlayerController::OnMainAction()
+{
+	// 기본 공격은 슬롯 1번에 할당된 MeleeAttack Ability 실행
+	ActivateAbilityBySlot(1);
 }
 
 void AMyPlayerController::OnMove(const FInputActionValue& Value)

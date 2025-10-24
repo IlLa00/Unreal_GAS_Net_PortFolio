@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
@@ -67,6 +67,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* TargetToggleAction;
 
+	// 마우스 왼쪽 클릭 (기본 공격)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* MainAction;
+
 	void OnMove(const struct FInputActionValue& Value);
 	void OnLook(const struct FInputActionValue& Value);
 	void OnJumpStarted();
@@ -74,6 +78,7 @@ protected:
 	void OnSprintStarted();
 	void OnSprintCompleted();
 	void OnTargetToggle();
+	void OnMainAction();
 
 	// ================================================================
 	// Ability Activation

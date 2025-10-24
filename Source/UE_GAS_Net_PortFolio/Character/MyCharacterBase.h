@@ -12,12 +12,11 @@ class UE_GAS_NET_PORTFOLIO_API AMyCharacterBase : public ACharacter
 
 public:
 	AMyCharacterBase();
-	
+
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };

@@ -3,7 +3,6 @@
 AMyCharacterBase::AMyCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void AMyCharacterBase::BeginPlay()

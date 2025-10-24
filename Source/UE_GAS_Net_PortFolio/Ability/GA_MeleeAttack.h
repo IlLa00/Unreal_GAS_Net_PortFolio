@@ -22,11 +22,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack")
 	float BaseDamage = 10.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack")
-	UAnimMontage* AttackMontage;
+	// 콤보 시스템
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combo")
+	TArray<UAnimMontage*> ComboMontages;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combo")
+	float ComboResetTime = 1.5f; // 콤보 초기화 시간
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combo")
+	int32 MaxComboCount = 3; // 최대 콤보 수
 
 	UFUNCTION()
 	void PerformAttack();
 
 	void ApplyDamageToTarget(AActor* Target);
+
+private:
+	// 콤보 관련 변수
+	int32 CurrentComboCount = 0;
+	FTimerHandle ComboResetTimerHandle;
+
+	void ResetCombo();
+	void PlayComboMontage();
 };

@@ -9,14 +9,19 @@
 UGA_MeleeAttack::UGA_MeleeAttack()
 {
 	AbilityName = FText::FromString(TEXT("Melee Attack"));
-	AbilityDescription = FText::FromString(TEXT("Basic melee attack"));
+	AbilityDescription = FText::FromString(TEXT("Basic melee attack with combo system"));
 	AbilitySlot = 1; // 1번 키
 
-	CooldownDuration = 1.0f;
+	CooldownDuration = 0.5f; // 콤보를 위해 쿨다운 감소
 	StaminaCost = 10.0f;
 
-	AttackRange = 200.0f; 
+	AttackRange = 300.0f;
 	BaseDamage = 10.0f;
+
+	// 콤보 설정
+	MaxComboCount = 3;
+	ComboResetTime = 1.5f;
+	CurrentComboCount = 0;
 }
 
 void UGA_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -28,25 +33,31 @@ void UGA_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 		return;
 	}
 
-	AActor* Target = GetCurrentTarget();
-	if (!IsTargetValid(Target))
+	// 콤보 카운트 증가
+	CurrentComboCount++;
+	if (CurrentComboCount > MaxComboCount)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No valid target for Melee Attack"));
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-		return;
+		CurrentComboCount = 1; // 최대 콤보 도달 시 1번으로 리셋
 	}
 
-	float DistanceToTarget = GetDistanceToTarget(Target);
-	if (DistanceToTarget > AttackRange)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Target too far: %.2f cm (max: %.2f cm)"), DistanceToTarget, AttackRange);
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-		return;
-	}
+	UE_LOG(LogTemp, Log, TEXT("Combo Attack: %d"), CurrentComboCount);
 
+	// 콤보 애니메이션 재생
+	PlayComboMontage();
+
+	// 콤보 리셋 타이머 갱신
 	ACharacter* Character = GetAvatarCharacter();
-	if (Character && AttackMontage)
-		Character->PlayAnimMontage(AttackMontage);
+	if (Character)
+	{
+		Character->GetWorldTimerManager().ClearTimer(ComboResetTimerHandle);
+		Character->GetWorldTimerManager().SetTimer(
+			ComboResetTimerHandle,
+			this,
+			&UGA_MeleeAttack::ResetCombo,
+			ComboResetTime,
+			false
+		);
+	}
 
 	PerformAttack();
 
@@ -82,7 +93,7 @@ void UGA_MeleeAttack::ApplyDamageToTarget(AActor* Target)
 		ACharacter* AvatarChar = GetAvatarCharacter();
 		if (AvatarChar)
 			UGameplayStatics::ApplyDamage(Enemy, BaseDamage, AvatarChar->GetController(), AvatarChar, UDamageType::StaticClass());
-		
+
 		return;
 	}
 
@@ -102,5 +113,29 @@ void UGA_MeleeAttack::ApplyDamageToTarget(AActor* Target)
 		TargetAttributeSet->SetHealth(NewHealth);
 
 		UE_LOG(LogTemp, Log, TEXT("Dealt %.2f damage to %s (HP: %.2f)"), FinalDamage, *Enemy->GetName(), NewHealth);
+	}
+}
+
+void UGA_MeleeAttack::ResetCombo()
+{
+	CurrentComboCount = 0;
+	UE_LOG(LogTemp, Log, TEXT("Combo Reset"));
+}
+
+void UGA_MeleeAttack::PlayComboMontage()
+{
+	ACharacter* Character = GetAvatarCharacter();
+	if (!Character) return;
+
+	// ComboMontages 배열에 몽타주가 설정되어 있으면 사용
+	if (ComboMontages.IsValidIndex(CurrentComboCount - 1) && ComboMontages[CurrentComboCount - 1])
+	{
+		UAnimMontage* MontageToPlay = ComboMontages[CurrentComboCount - 1];
+		Character->PlayAnimMontage(MontageToPlay);
+		UE_LOG(LogTemp, Log, TEXT("Playing Combo Montage %d: %s"), CurrentComboCount, *MontageToPlay->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Combo Montage %d not set! Please add montages to ComboMontages array in Blueprint."), CurrentComboCount);
 	}
 }
